@@ -1,8 +1,7 @@
 from flask import Flask
 import os
 from flask_cors import CORS
-from bs4 import BeautifulSoup
-from api.schema.flowerSchema import flower
+from api.route.flowerRoutes import flower
 
 
 # Init App

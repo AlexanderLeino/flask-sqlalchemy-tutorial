@@ -1,4 +1,4 @@
-from main import ma
+from config.config import ma
 class ProductSchema(ma.Schema):
     class Meta: 
         fields = ('id', 'name', 'description', 'price', 'qty')

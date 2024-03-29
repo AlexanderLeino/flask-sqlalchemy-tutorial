@@ -1,10 +1,8 @@
-from model.models import Product
+from api.model import models
 from flask import request , jsonify, Blueprint
 from schema.flowerSchema import product_schema, products_schema
 from config import db
 import werkzeug
-from ..model.models import Product
-from werkzeug.exceptions import HTTPException
 
 flower = Blueprint("flower", __name__)
 
@@ -16,7 +14,7 @@ def add_product():
     price = request.json['price']
     qty = request.json['qty']
 
-    new_product = Product(name, description, price, qty)
+    new_product = models.flower(name, description, price, qty)
     add_result = db.session.add(new_product)
     print("ADD RESULT", add_result)
     db.session.commit()
@@ -27,21 +25,21 @@ def add_product():
 # Get All Products
 @flower.route('/product', methods=["GET"])
 def get_products():
-    all_products = Product.query.all()
+    all_products = models.flower.query.all()
     # Must use .dump because its returning an array of dicitionaries
     result = products_schema.dump(all_products)
     return jsonify(result)
 
-# Get One Product
+# Get Onemodels.flower
 @flower.route("/product/<id>",methods=["GET"])
 def getProduct(id): 
-    product = Product.query.get(id)
+    product =models.flower.query.get(id)
     return product_schema.jsonify(product)
 
-# Update Product
+# Updatemodels.flower
 @flower.route("/product/<id>", methods=["PUT"])
 def updateProduct(id): 
-    product = Product.query.get(id)
+    product =models.flower.query.get(id)
     name = request.json['name']
     description = request.json['description']
     price = request.json['price']
@@ -57,7 +55,7 @@ def updateProduct(id):
 
 @flower.route("/product/<id>", methods=['DELETE'])
 def delete_product(id):
-    product = Product.query.get(id)
+    product =models.flower.query.get(id)
     db.session.delete(product)
     db.session.commit()
     return product_schema.jsonify(product)
