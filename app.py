@@ -8,7 +8,7 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Database
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+mysqlconnector://root:root@localhost:3306/greeneyedb'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Init db
@@ -19,6 +19,7 @@ ma = Marshmallow(app)
 
 # Product Class/Model
 class Product(db.Model): 
+    __tablename__ = "product"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
     description = db.Column(db.String(200))
