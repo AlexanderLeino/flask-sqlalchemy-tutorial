@@ -1,19 +1,33 @@
+from flask import g
+
+class flower(g.db.Model): 
+    id = g.db.Column(g.db.Integer, primary_key=True)
+    name = g.db.Column(g.db.String(100), unique=True)
+    description = g.db.Column(g.db.String(200))
+    price = g.db.Column(g.db.Float)
+    qty = g.db.Column(g.db.Integer)
+
+    def __init__(self, name, description, price, qty):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.qty = qty
 
 
-# class flower(db.Model): 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(100), unique=True)
-#     description = db.Column(db.String(200))
-#     price = db.Column(db.Float)
-#     qty = db.Column(db.Integer)
+class Product(g.db.Model): 
+    id = g.db.Column(g.db.Integer, primary_key=True)
+    name = g.db.Column(g.db.String(100), unique=True)
+    description = g.db.Column(g.db.String(200))
+    price = g.db.Column(g.db.Float)
+    qty = g.db.Column(g.db.Integer)
 
-#     def __init__(self, name, description, price, qty):
-#         self.name = name
-#         self.description = description
-#         self.price = price
-#         self.qty = qty
+    def __init__(self, name, description, price, qty):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.qty = qty
 
-# class flowerSchema(ma.Schema):
-#     class Meta: 
-#         fields = ('id', 'name', 'description', 'price', 'qty')
-
+# Product Schema
+class ProductSchema(g.ma.Schema):
+    class Meta: 
+        fields = ('id', 'name', 'description', 'price', 'qty')

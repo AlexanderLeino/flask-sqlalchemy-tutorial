@@ -1,66 +1,89 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os 
+from flask import jsonify
+from api.model.models import flower
+from api.schema.flowerSchema import products_schema, product_schema
 
 # Init App
 app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Database
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+mysqlconnector://root:root@localhost:3306/greeneyedb'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Init db
-db = SQLAlchemy(app)
+
 
 # Init ma
 ma = Marshmallow(app)
 
-# Product Class/Model
-class Product(db.Model): 
-    __tablename__ = "product"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
-    description = db.Column(db.String(200))
-    price = db.Column(db.Float)
-    qty = db.Column(db.Integer)
+def get_ma():
+    if 'ma' not in g:
+        g.ma = ma
+        ("print G", g.db
+         )
+    return g.db
 
-    def __init__(self, name, description, price, qty):
-        self.name = name
-        self.description = description
-        self.price = price
-        self.qty = qty
-
-# Product Schema
-class ProductSchema(ma.Schema):
-    class Meta: 
-        fields = ('id', 'name', 'description', 'price', 'qty')
+@app.teardown_appcontext
+def teardown_db(exception):
+    g.pop('ma', None)
+#
 
 
-# Init Schema
-product_schema = ProductSchema()
-products_schema = ProductSchema(many=True)
+def get_db():
+    print("GETTING DB SET")
+    if 'db' not in g:
+        g.db = SQLAlchemy(app)
+        ("print G", g.db
+         )
+    return g.db
 
-# Create a Product
-@app.route('/product', methods=['POST'])
-def add_product(): 
-    name = request.json['name']
-    description = request.json['description']
-    price = request.json['price']
-    qty = request.json['qty']
+@app.teardown_appcontext
+def teardown_db(exception):
+    db = g.pop('db', None)
 
-    new_product = Product(name, description, price, qty)
-    db.session.add(new_product)
-    db.session.commit()
+    if db is not None:
+        db.close()
+#
 
-    return product_schema.jsonify(new_product)
+# # Product Schema
+# class ProductSchema(ma.Schema):
+#     class Meta: 
+#         fields = ('id', 'name', 'description', 'price', 'qty')
 
 
-@app.route('/', methods=["GET"])
-def find_product():
-    return 
-# Run Server
+# # Init Schema
+# product_schema = ProductSchema()
+# products_schema = ProductSchema(many=True)
 
+# # Create a Product
+# @app.route('/product', methods=['POST'])
+# def add_product(): 
+#     name = request.json['name']
+#     description = request.json['description']
+#     price = request.json['price']
+#     qty = request.json['qty']
+
+#     new_product = Product(name, description, price, qty)
+#     db.session.add(new_product)
+#     db.session.commit()
+
+#     return product_schema.jsonify(new_product)
+
+
+# @app.route('/', methods=["GET"])
+# def find_product():
+#     return 
+# # Run Server
+app.route('/product', methods=["GET"])
+def get_products():
+    all_products = flower.query.all()
+    # Must use .dump because its returning an array of dicitionaries
+    result = products_schema.dump(all_products)
+    return jsonify(result)
 if __name__ == '__main__':
     app.run(debug=True)
+    get_db()
+    get_ma()
